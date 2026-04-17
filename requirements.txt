@@ -1,0 +1,13 @@
+Django>=4.2
+gunicorn
+psycopg2-binary
+dj-database-url
+python-dotenv
+whitenoise
+pillow
+scikit-learn
+django-unfold
+django-allauth
+requests
+PyJWT
+cryptography
