@@ -1,0 +1,140 @@
+{% load static %}
+<div class="relative bg-white border-2 border-cyan-200 rounded-lg shadow-sm hover:shadow-md hover:shadow-cyan-200 transition-shadow duration-300 overflow-hidden">
+    <div class="p-6">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-start gap-4">
+                    <a href="?company={{ job.company.public_url }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.employment_type %}&employment_type={{ request.GET.employment_type }}{% endif %}{% if request.GET.work_mode %}&work_mode={{ request.GET.work_mode }}{% endif %}{% if request.GET.min_experience %}&min_experience={{ request.GET.min_experience }}{% endif %}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if request.GET.max_salary %}&max_salary={{ request.GET.max_salary }}{% endif %}"
+                        class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-gray-50 to-gray-300 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                        <img src="{{ job.company.logo.url }}" alt="{{ job.company.name }}" class="w-12 h-12 object-contain rounded-full" />
+                    </a>
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-gray-900 hover:text-cyan-600 transition duration-300">
+                                            <a href="{% url 'job_detail' job.id %}">{{ job.title }}</a>
+                                        </h3>
+                                        <p class="text-gray-600 mt-1">{{ job.company.name }}</p>
+                                    </div>
+                                    {% if not hide_matching_score and job.similarity_score %}
+                                        <span class="bg-cyan-100 text-cyan-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-cyan-200">{{ job.similarity_score }}% Match</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if show_recruiter_actions and job.recruiter == user %}
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'job_update' job.id %}" class="px-3 py-1 text-sm text-cyan-600 hover:text-cyan-700 border border-cyan-600 rounded-md hover:bg-cyan-50 transition duration-300">
+                                    <i class="fas fa-edit mr-1"></i>Edit
+                                </a>
+                                <button type="button" onclick="openDeleteModal({{ job.id }})"
+                                        class="px-3 py-1 text-sm text-red-600 hover:text-red-700 border border-red-600 rounded-md hover:bg-red-50 transition duration-300">
+                                    <i class="fas fa-trash mr-1"></i>Delete
+                                </button>
+                                
+                                <!-- Delete Form and Modal (Specific to this job) -->
+                                <form id="deleteForm-{{ job.id }}" method="POST" action="{% url 'job_delete' job.id %}" class="hidden">
+                                    {% csrf_token %}
+                                </form>
+                                <div id="deleteModal-{{ job.id }}" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+                                    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all">
+                                        <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                                            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                                        </div>
+                                        <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">
+                                            Delete Job Posting
+                                        </h3>
+                                        <p class="text-sm text-gray-600 text-center mb-6">
+                                            Are you sure you want to delete "{{ job.title }}"? This action cannot be undone and all associated applications will be permanently removed.
+                                        </p>
+                                        <div class="flex gap-3">
+                                            <button type="button" onclick="closeDeleteModal({{ job.id }})" class="bg-cyan-500 flex-1 px-4 py-2 text-sm font-medium text-white rounded-md hover:bg-cyan-600 transition duration-300">
+                                                Cancel
+                                            </button>
+                                            <button type="button" onclick="document.getElementById('deleteForm-{{ job.id }}').submit()"
+                                                    class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition duration-300">
+                                                Delete Job
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
+                            <span class="flex items-center">
+                                <i class="fas fa-map-marker-alt mr-1 text-cyan-600"></i>
+                                {{ job.location }}
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fas fa-briefcase mr-1 text-cyan-600"></i>
+                                {{ job.get_employment_type_display }}
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fas fa-laptop-house mr-1 text-cyan-600"></i>
+                                {{ job.get_work_mode_display }}
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fas fa-clock mr-1 text-cyan-600"></i>
+                                {{ job.min_experience }} year{{ job.min_experience|pluralize }} exp
+                            </span>
+                        </div>
+                        <div class="flex gap-2 items-center mt-2">
+                            {% if job.salary_min and job.salary_max %}
+                                <span class="flex items-center font-semibold text-green-600">${{ job.salary_min|floatformat:0 }} - ${{ job.salary_max|floatformat:0 }}</span>
+                            {% endif %}
+                            {% if job.skills.all %}
+                                <div class="flex flex-wrap gap-2">
+                                    {% for skill in job.skills.all|slice:':2' %}
+                                        <span class="px-2 py-0.5 bg-cyan-50 text-cyan-700 text-xs font-medium rounded-full border border-cyan-200">{{ skill.name }}</span>
+                                    {% endfor %}
+                                    {% if job.skills.count > 2 %}
+                                        <span 
+                                        title="{% for skill in job.skills.all %}{% if forloop.counter > 2 %}{{ skill.name }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}"
+                                        class="border-2 border-cyan-700 px-2 py-0.5 bg-white text-gray-600 text-xs font-medium rounded-full">
+                                            +{{ job.skills.count|add:'-2' }} more
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <p class="mt-3 text-sm text-gray-600 line-clamp-2">{{ job.description|truncatewords:30 }}</p>
+
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-4 text-xs text-gray-500">
+                                <span>
+                                    <i class="fas fa-users mr-1"></i>
+                                    {{ job.vacancies }} position{{ job.vacancies|pluralize }}
+                                </span>
+                                <span>
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    Posted {{ job.created_at|timesince }} ago
+                                </span>
+                                {% if not hide_application_status and job.application_status %}
+                                    <span class="px-2 absolute right-2 top-2 py-1 rounded-full font-medium
+                                        {% if job.application_status == 'applied' %}bg-blue-100 text-blue-800{% endif %}
+                                        {% if job.application_status == 'reviewing' %}bg-yellow-100 text-yellow-800{% endif %}
+                                        {% if job.application_status == 'shortlisted' %}bg-green-100 text-green-800{% endif %}
+                                        {% if job.application_status == 'rejected' %}bg-red-100 text-red-800{% endif %}
+                                        {% if job.application_status == 'hired' %}bg-purple-100 text-purple-800{% endif %}
+                                        ">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        {{ job.application_status|title }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'job_detail' job.id %}" class="inline-flex items-center px-4 py-1 bg-cyan-600 text-white text-sm font-medium rounded-md hover:bg-cyan-700 transition duration-300">
+                                View
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

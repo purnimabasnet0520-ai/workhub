@@ -1,0 +1,33 @@
+{% extends 'emails/base_email.html' %}
+
+{% block eyebrow %}Account Verification{% endblock %}
+
+{% block headline %}{{ headline|safe }}{% endblock %}
+
+{% block greeting %}Hello {{ user.username }},{% endblock %}
+
+{% block body_text %}{{ body_text|safe }}{% endblock %}
+
+{% block cta_section %}
+<div style="margin: 32px 0; padding: 24px; text-align: center; background: #f0f9ff; border: 2px dashed #bae6fd; border-radius: 12px;">
+  <p style="font-size: 14px; color: #0284c7; margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Your Verification Code</p>
+  <span style="display: inline-block; font-size: 36px; font-weight: 700; color: #0891b2; letter-spacing: 8px;">{{ otp_code }}</span>
+</div>
+{% endblock %}
+
+{% block extra_notice %}
+<div class="notice">
+  <div class="notice-icon">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8" cy="8" r="7" stroke="#0891b2" stroke-width="1.5" />
+      <path d="M8 4.5v4" stroke="#0891b2" stroke-width="1.5" stroke-linecap="round" />
+      <circle cx="8" cy="11" r="0.75" fill="#0891b2" />
+    </svg>
+  </div>
+  <p class="notice-text">
+    <strong>This code expires in 24 hours.</strong> Please do not share this code with anyone.
+  </p>
+</div>
+{% endblock %}
+
+{% block ignore_note %}<p class="ignore-note">If you didn't request this code, you can safely ignore this email.</p>{% endblock %}

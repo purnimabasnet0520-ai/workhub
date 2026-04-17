@@ -1,0 +1,208 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Post a New Job</h1>
+          <p class="mt-1 text-sm text-gray-600">Fill in the details to create a job posting</p>
+        </div>
+        <a href="/jobs"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+          <i class="fas fa-arrow-left mr-2"></i>
+          Back to Jobs
+        </a>
+      </div>
+    </div>
+    <form method="POST" class="space-y-3">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="flex">
+          <i class="fas fa-exclamation-circle text-red-400 mr-3"></i>
+          <div class="text-sm text-red-800">
+            {{ form.non_field_errors }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i class="fas fa-briefcase mr-2 text-cyan-600"></i>
+          Basic Information
+        </h2>
+        <div class="space-y-4">
+          <div>
+            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.title.label }}
+              {% if form.title.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.title }}
+            {% if form.title.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.title.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.company.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.company.label }}
+              {% if form.company.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.company }}
+            {% if form.company.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.company.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.location.label }}
+              {% if form.location.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.location }}
+            {% if form.location.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.location.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.description.label }}
+              {% if form.description.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.description.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i class="fas fa-cog mr-2 text-cyan-600"></i>
+          Job Details
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="{{ form.employment_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.employment_type.label }}
+              {% if form.employment_type.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.employment_type }}
+            {% if form.employment_type.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.employment_type.errors }}</div>
+            {% endif %}
+          </div>
+          <div>
+            <label for="{{ form.work_mode.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.work_mode.label }}
+              {% if form.work_mode.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.work_mode }}
+            {% if form.work_mode.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.work_mode.errors }}</div>
+            {% endif %}
+          </div>
+          <div>
+            <label for="{{ form.min_experience.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.min_experience.label }}
+              {% if form.min_experience.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.min_experience }}
+            {% if form.min_experience.help_text %}
+            <p class="mt-1 text-xs text-gray-500">{{ form.min_experience.help_text }}</p>
+            {% endif %}
+            {% if form.min_experience.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.min_experience.errors }}</div>
+            {% endif %}
+          </div>
+          <div>
+            <label for="{{ form.vacancies.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.vacancies.label }}
+              {% if form.vacancies.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
+            {{ form.vacancies }}
+            {% if form.vacancies.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.vacancies.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i class="fas fa-dollar-sign mr-2 text-cyan-600"></i>
+          Salary Range <p class="text-sm text-gray-600 px-2">(Leave maximum and minimum salary blank if negotiable)</p>
+        </h2>
+
+        {% include 'components/salary_range_slider.html' with inline=true min_id=form.salary_min.id_for_label max_id=form.salary_max.id_for_label min_value=form.salary_min.value|default:0 max_value=form.salary_max.value|default:50000 %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="{{ form.salary_min.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.salary_min.label }}
+            </label>
+            {{ form.salary_min }}
+            {% if form.salary_min.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.salary_min.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.salary_max.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.salary_max.label }}
+            </label>
+            {{ form.salary_max }}
+            {% if form.salary_max.errors %}
+            <div class="mt-1 text-sm text-red-600">{{ form.salary_max.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i class="fas fa-code mr-2 text-cyan-600"></i>
+          Required Skills
+        </h2>
+
+        <div>
+          {% include 'components/skills_input.html' with container_id='skills-container' input_id='skills-input' hidden_id='skills-hidden' dropdown_id='skills-dropdown' suggestions_id='skills-suggestions' name='skills' label='Select Required Skills' placeholder='Type to search and add skills' skills=skills %}
+          {% if form.skills.errors %}
+          <div class="text-red-600 text-sm">{{ form.skills.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          Job Status
+        </h2>
+
+        <div class="flex items-center">
+          <label class="flex items-center cursor-pointer">
+            {{ form.is_active }}
+            <span class="ml-2 text-sm text-gray-700">{{ form.is_active.label }}</span>
+          </label>
+        </div>
+        {% if form.is_active.help_text %}
+        <p class="mt-2 text-sm text-gray-500">{{ form.is_active.help_text }}</p>
+        {% endif %}
+        {% if form.is_active.errors %}
+        <div class="mt-1 text-sm text-red-600">{{ form.is_active.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <a href="/jobs"
+          class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+          Cancel
+        </a>
+        <button type="submit"
+          class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+          <i class="fas fa-check mr-2"></i>
+          Post Job
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'emails/base_email.html' %}
+
+{% block eyebrow %}New Job Application{% endblock %}
+
+{% block headline %}New Application for <em>{{ job_title }}</em>{% endblock %}
+
+{% block greeting %}Hello {{ employer_name }},{% endblock %}
+
+{% block body_text %}You have received a new application for the position of <strong>{{ job_title }}</strong> from <strong>{{ applicant_name }}</strong>.{% endblock %}
+
+{% block cta_section %}{% endblock %}
+
+{% block extra_notice %}
+<div class="notice" style="background: #ecfeff; border: 1px solid #a5f3fc;">
+  <div class="notice-icon">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 1L10.5 5.5L15 6L11.5 9.5L12.5 14L8 11.5L3.5 14L4.5 9.5L1 6L5.5 5.5L8 1Z" stroke="#0891b2" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <p class="notice-text">
+    <strong>Applicant Details:</strong><br>
+    Email: {{ applicant_email }}<br>
+    Applied on: {{ applied_at }}
+  </p>
+</div>
+{% endblock %}
+
+{% block ignore_note %}<p class="ignore-note">Log in to your Workhub account to review the application and take further action.</p>{% endblock %}

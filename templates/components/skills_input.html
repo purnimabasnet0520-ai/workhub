@@ -1,0 +1,105 @@
+<div class="space-y-2 relative w-full" id="{{ container_id }}">
+  <label for="{{ input_id }}" class="block text-sm font-semibold text-gray-700">{{ label }}</label>
+  <div class="flex flex-wrap gap-2 px-3 py-2 border-2 border-cyan-300 rounded-lg focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all min-h-[44px] items-center cursor-text relative" id="{{ container_id }}-wrapper">
+    <input type="text" id="{{ input_id }}" placeholder="{{ placeholder }}" class="flex-1 outline-none" autocomplete="off" />
+    <button type="button" id="{{ dropdown_id }}" class="ml-2 text-gray-500 hover:text-gray-700">&#9662;</button>
+  </div>
+  <input type="hidden" name="{{ name }}" id="{{ hidden_id }}" value="{{ value|default:'' }}" />
+  <ul id="{{ suggestions_id }}" class="absolute left-0 right-0 mt-1 border rounded bg-white max-h-40 overflow-y-auto hidden z-50"></ul>
+</div>
+<script>
+;(function () {
+  const skillOptions = {{ skills|safe }};
+  let selectedSkills = [];
+  const skillsInput = document.getElementById('{{ input_id }}');
+  const wrapper = document.getElementById('{{ container_id }}-wrapper');
+  const skillsHidden = document.getElementById('{{ hidden_id }}');
+  const suggestionsBox = document.getElementById('{{ suggestions_id }}');
+  const dropdownBtn = document.getElementById('{{ dropdown_id }}');
+  if (skillsHidden.value) {
+    selectedSkills = skillsHidden.value.split(',').map(id => parseInt(id)).filter(Boolean);
+    selectedSkills.forEach(id => {
+      const skill = skillOptions.find(s => s.id === id);
+      if (skill) createChip(skill);
+    });
+  }
+  function updateHiddenInput() {
+    skillsHidden.value = selectedSkills.join(',');
+  }
+  function createChip(skill) {
+    if (selectedSkills.includes(skill.id) && wrapper.querySelector(`[data-skill-id='${skill.id}']`)) return;
+    const chip = document.createElement('span');
+    chip.className = 'bg-blue-500 text-sm font-semibold text-white px-2 py-1 rounded flex items-center gap-1';
+    chip.setAttribute('data-skill-id', skill.id);
+    chip.innerHTML = `${skill.name} <button type="button" class="ml-1 font-bold">&times;</button>`;
+    chip.querySelector('button').addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedSkills = selectedSkills.filter(s => s !== skill.id);
+      chip.remove();
+      updateHiddenInput();
+    });
+    wrapper.insertBefore(chip, skillsInput);
+  }
+
+  function renderSuggestions(filtered, showAll = false) {
+    suggestionsBox.innerHTML = '';
+    if (filtered.length === 0) {
+      suggestionsBox.classList.add('hidden');
+      return;
+    }
+    const count = showAll ? filtered.length : 5;
+    filtered.slice(0, count).forEach(skill => {
+      const li = document.createElement('li');
+      li.className = 'px-2 py-1 hover:bg-gray-200 cursor-pointer';
+      li.textContent = skill.name;
+      li.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!selectedSkills.includes(skill.id)) {
+          selectedSkills.push(skill.id);
+          createChip(skill);
+          updateHiddenInput();
+        }
+        skillsInput.value = '';
+        suggestionsBox.classList.add('hidden');
+      });
+      suggestionsBox.appendChild(li);
+    });
+    suggestionsBox.classList.remove('hidden');
+  }
+  skillsInput.addEventListener('input', () => {
+    const query = skillsInput.value.toLowerCase();
+    const filtered = skillOptions.filter(skill => 
+      skill.name.toLowerCase().includes(query) && !selectedSkills.includes(skill.id)
+    );
+    renderSuggestions(filtered);
+  });
+  skillsInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const first = suggestionsBox.querySelector('li');
+      if (first) {
+        const skillName = first.textContent;
+        const skill = skillOptions.find(s => s.name === skillName);
+        if (skill && !selectedSkills.includes(skill.id)) {
+          selectedSkills.push(skill.id);
+          createChip(skill);
+          updateHiddenInput();
+        }
+        skillsInput.value = '';
+        suggestionsBox.classList.add('hidden');
+      }
+      e.preventDefault();
+    }
+  });
+  dropdownBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const filtered = skillOptions.filter(skill => !selectedSkills.includes(skill.id));
+    renderSuggestions(filtered, true);
+  });
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) {
+      suggestionsBox.classList.add('hidden');
+    }
+  });
+})();
+</script>
+

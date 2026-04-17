@@ -1,0 +1,145 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+      <div class="p-8 pb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-end gap-6">
+          {% if company.logo %}
+            <img src="{{ company.logo.url }}" alt="{{ company.name }}" class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl object-contain bg-white p-2 border border-gray-200 shadow-md -mt-14">
+          {% else %}
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-3xl font-bold border border-gray-200 shadow-md -mt-14">
+              {{ company.name|slice:":1" }}
+            </div>
+          {% endif %}
+          <div class="flex-1">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+              {{ company.name }}
+            </h1>
+            {% if company.tagline %}
+              <p class="text-lg text-gray-600 mb-3">
+                {{ company.tagline }}
+              </p>
+            {% endif %}
+            <div class="flex flex-wrap gap-5 text-sm text-gray-500">
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-briefcase"></i>
+                {{ company.industry }}
+              </span>
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-users"></i>
+                {{ company.organization_size }}
+              </span>
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-building"></i>
+                {{ company.organization_type }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 flex flex-wrap gap-3">
+          {% if request.user == company.created_by %}
+          <a href="{% url 'edit_company' company.public_url %}" class="inline-flex items-center px-6 py-2.5 bg-cyan-600 text-white font-semibold rounded-full hover:bg-cyan-700 transition shadow-md">
+            <i class="fa-solid fa-pen-to-square mr-2"></i>
+            Edit Company
+          </a>
+          {% endif %}
+          {% if company.website %}
+          <a href="{{ company.website }}" target="_blank" rel="noopener noreferrer"
+            class="inline-flex items-center px-6 py-2.5 bg-white text-cyan-700 font-semibold rounded-full border-2 border-cyan-600 hover:bg-cyan-50 transition">
+            <i class="fa-solid fa-arrow-up-right-from-square mr-2"></i>
+            Visit Website
+          </a>
+          {% endif %}
+          <a href="{% url 'company_list' %}" class="inline-flex items-center px-6 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-full hover:bg-gray-200 transition">
+            <i class="fa-solid fa-arrow-left mr-2"></i>
+            Back to List
+          </a>
+        </div>
+      </div>
+      <div class="border-t"></div>
+      <div class="p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="lg:col-span-2 space-y-8">
+            <div>
+              <h2 class="text-2xl font-bold mb-4">About</h2>
+              <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                {{ company.description }}
+              </p>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold mb-4">Overview</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="flex">
+                  <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa-solid fa-briefcase text-cyan-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500 uppercase">Industry</p>
+                    <p class="font-medium">{{ company.industry }}</p>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa-solid fa-users text-cyan-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500 uppercase">Company Size</p>
+                    <p class="font-medium">{{ company.organization_size }}</p>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa-solid fa-building text-cyan-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500 uppercase">Organization Type</p>
+                    <p class="font-medium">{{ company.organization_type }}</p>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fa-solid fa-calendar-days text-cyan-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500 uppercase">Founded</p>
+                    <p class="font-medium">
+                      {{ company.created_at|date:"F Y" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="bg-gray-50 rounded-lg p-6 border">
+              <h3 class="text-lg font-bold mb-4">Company Information</h3>
+              <div class="space-y-4">
+                {% if company.website %}
+                <div>
+                  <p class="text-sm text-gray-500">Website</p>
+                  <a href="{{ company.website }}" target="_blank" class="text-cyan-600 hover:underline break-all">
+                    {{ company.website }}
+                  </a>
+                </div>
+                {% endif %}
+                <div>
+                  <p class="text-sm text-gray-500">Company Page</p>
+                  <p class="font-medium">{{ company.public_url }}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Created</p>
+                  <p class="font-medium">
+                    {{ company.created_at|date:"F d, Y" }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

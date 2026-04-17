@@ -1,0 +1,225 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+{% with error_classes='text-sm text-red-500' %}
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Edit Profile</h1>
+          <p class="mt-1 text-sm text-gray-600">Update your personal information and preferences</p>
+        </div>
+        <a href="{% url 'profile' %}"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+          <i class="fas fa-arrow-left mr-2"></i>
+          Back to Profile
+        </a>
+      </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="col-span-1 space-y-2">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Profile Picture</h2>
+            <div class="flex flex-col items-center">
+              <div class="relative mb-4 profile_image-container">
+                <img id="profilePreview" src="{{ profile.profile_image.url }}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-gray-200 object-cover" />
+                <label for="id_profile_image"
+                  class="absolute bottom-1 right-1 bg-cyan-600 text-white rounded-full py-1 px-2 cursor-pointer hover:bg-cyan-700 transition"><i
+                    class="fas fa-camera"></i></label>
+              </div>
+              <input type="file" name="profile_image" id="id_profile_image" accept="image/*" class="hidden" />
+              <p class="text-xs text-gray-500 text-center">Click the camera icon to upload new image</p>
+              {% if profile_form.errors.profile_image %}
+              <div class="{{ error_classes }}">{{ profile_form.errors.profile_image }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-address-book mr-2 text-gray-600"></i> Contact Information</h2>
+            <div>
+              <label for="id_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input type="tel" name="phone" id="id_phone" value="{{ profile.phone }}" maxlength="10"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+              {% if profile_form.errors.phone %}
+              <div class="{{ error_classes }}">{{ profile_form.errors.phone }}</div>
+              {% endif %}
+            </div>
+
+            {% include 'components/select_countries.html' with input_id='id_nationality' input_name="nationality" default_value=profile.nationality %}
+
+            <div class="mt-4">
+              <label for="id_address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+              <input type="text" name="address" id="id_address" value="{{ profile.address }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+              {% if profile_form.errors.address %}
+              <div class="{{ error_classes }}">{{ profile_form.errors.address }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6" id="jobPreferences">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-map-marker-alt mr-2 text-gray-600"></i>
+              Job Preferences
+            </h2>
+            <div>
+              <label for="id_preferred_location" class="block text-sm font-medium text-gray-700 mb-1">Preferred
+                Location</label>
+              <input type="text" name="preferred_location" id="id_preferred_location"
+                value="{{ profile.preferred_location }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                placeholder="e.g., Kathmandu, Remote" />
+              {% if profile_form.errors.prefered_location %}
+              <div class="{{ error_classes }}">{{ profile_form.errors.prefered_location }}</div>
+              {% endif %}
+            </div>
+            <div class="mt-4">
+              <label for="id_preferred_job_type" class="block text-sm font-medium text-gray-700 mb-1">Preferred Job
+                Type</label>
+              <select name="preferred_job_type" id="id_preferred_job_type"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                <option value="">---------</option>
+                <option value="Full Time" {% if profile.preferred_job_type == "Full Time" %}selected{% endif %}>Full Time</option>
+                <option value="Part Time" {% if profile.preferred_job_type == "Part Time" %}selected{% endif %}>Part Time</option>
+                <option value="Contract" {% if profile.preferred_job_type == "Contract" %}selected{% endif %}>Contract</option>
+                <option value="Internship" {% if profile.preferred_job_type == "Internship" %}selected{% endif %}>
+                  Internship</option>
+              </select>
+              {% if profile_form.errors.preferred_job_type %}
+              <div class="{{ error_classes }}">{{ profile_form.errors.preferred_job_type }}</div>
+              {% endif %}
+            </div>
+            <div class="mt-4">
+              <label for="id_preferred_work_mode" class="block text-sm font-medium text-gray-700 mb-1">Preferred Work
+                Mode</label>
+              <select name="preferred_work_mode" id="id_preferred_work_mode"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                <option value="">---------</option>
+                <option value="On-site" {% if profile.preferred_work_mode == "On-site" %}selected{% endif %}>On-site</option>
+                <option value="Remote" {% if profile.preferred_work_mode == "Remote" %}selected{% endif %}>Remote</option>
+                <option value="Hybrid" {% if profile.preferred_work_mode == "Hybrid" %}selected{% endif %}>Hybrid</option>
+              </select>
+              {% if profile_form.errors.preferred_work_mode %}
+              <div class="{{ error_classes }}">{{ profile_form.errors.preferred_work_mode }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-span-1 lg:col-span-2 space-y-2">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fa fa-briefcase mr-2 text-gray-600"></i>
+              Job Title</h2>
+            <input type="text" name="position" id="id_position" value="{{ profile.position }}"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+            {% if profile_form.errors.position %}
+            <div class="{{ error_classes }}">{{ profile_form.errors.position }}</div>
+            {% endif %}
+
+            <h2 class="text-lg font-semibold text-gray-900 my-4"><i class="fa fa-list-alt mr-2 text-gray-600"></i>
+              Professional Summary </h2>
+            <textarea name="summary" id="id_summary" rows="5"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+              placeholder="Tell us about yourself, your experience, and what you're looking for...">{{ profile.summary }}</textarea>
+            {% if profile_form.errors.summary %}
+            <div class="{{ error_classes }}">{{ profile_form.errors.summary }}</div>
+            {% endif %}
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <div class="space-y-4">
+              <div>
+                <label for="id_username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" name="username" id="id_username" value="{{ user.username }}"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+                {% if user_form.errors.username %}
+                <div class="{{ error_classes }}">{{ user_form.errors.username }}</div>
+                {% endif %}
+              </div>
+              <div>
+                <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" name="email" id="id_email" value="{{ user.email }}"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+                {% if user_form.errors.email %}
+                <div class="{{ error_classes }}">{{ user_form.errors.email }}</div>
+                {% endif %}
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="id_first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input type="text" name="first_name" id="id_first_name" value="{{ user.first_name }}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+                  {% if user_form.errors.first_name %}
+                  <div class="{{ error_classes }}">{{ user_form.errors.first_name }}</div>
+                  {% endif %}
+                </div>
+                <div>
+                  <label for="id_last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input type="text" name="last_name" id="id_last_name" value="{{ user.last_name }}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+                  {% if user_form.errors.last_name %}
+                  <div class="{{ error_classes }}">{{ user_form.errors.last_name }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div>
+                <label for="id_gender" class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <select name="gender" id="id_gender"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                  <option value="Male" {% if profile.gender == "Male" %}selected{% endif %}>Male</option>
+                  <option value="Female" {% if profile.gender == "Female" %}selected{% endif %}>Female</option>
+                  <option value="Others" {% if profile.gender == "Others" %}selected{% endif %}>Others</option>
+                </select>
+                {% if profile_form.errors.gender %}
+                <div class="{{ error_classes }}">{{ profile_form.errors.gender }}</div>
+                {% endif %}
+              </div>
+              <div>
+                <label for="id_dob" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                <input type="date" name="dob" id="id_dob" value="{{ profile.dob|date:'Y-m-d' }}"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent" />
+                {% if profile_form.errors.gender %}
+                <div class="{{ error_classes }}">{{ profile_form.errors.gender }}</div>
+                {% endif %}
+              </div>
+              <div>
+                <label for="id_role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select name="role" id="id_role"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                  <option value="Job Seeker" {% if profile.role == "Job Seeker" %}selected{% endif %}>Job Seeker</option>
+                  <option value="Recruiter" {% if profile.role == "Recruiter" %}selected{% endif %}>Recruiter</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-3">
+        <a href="{% url 'profile' %}"
+          class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">Cancel</a>
+        <button type="submit"
+          class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+          <i class="fas fa-save mr-2"></i>
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById('id_profile_image').addEventListener('change', function (e) {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        document.getElementById('profilePreview').src = e.target.result
+      }
+      reader.readAsDataURL(file)
+    }
+  })
+</script>
+{% endwith %}
+{% endblock %}

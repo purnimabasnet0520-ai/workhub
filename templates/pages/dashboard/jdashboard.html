@@ -1,0 +1,25 @@
+{% extends 'layouts/main.html' %}
+
+{% block content %}
+  <div class="min-h-screen w-full max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <h1 class="text-3xl font-bold text-gray-800 mt-2">Welcome back! <span class="text-cyan-500">{{ request.user.first_name }}</span></h1>
+    <hr class="my-4" />
+    <div class="mt-6 text-left w-full">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-2">Recommended Jobs</h2>
+
+      {% if recommended_jobs %}
+        <div class=" grid grid-cols-1 md:grid-cols-2 gap-4 gap-4">
+          {% for job in recommended_jobs %}
+            {% include 'components/job_card.html' with job=job hide_application_status=True show_recruiter_actions=False %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="bg-white p-8 rounded-xl text-center border border-cyan-200">
+          <p class="text-gray-600 mb-2">We couldn't find any job recommendations for you yet.</p>
+          <p class="text-sm text-gray-500">Update your profile with more skills and experience to get better matches!</p>
+          <a href="{% url 'profile' %}" class="mt-4 inline-block bg-cyan-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-cyan-700">Update Profile</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

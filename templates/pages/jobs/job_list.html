@@ -1,0 +1,305 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-4">
+  <div class="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-6 gap-4">
+      <div class="">
+        <h1 class="text-3xl font-bold text-gray-900">Browse Jobs</h1>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="relative" id="filtersDropdown">
+          <button type="button" onclick="toggleFiltersDropdown()" 
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+            <i class="fas fa-filter text-cyan-600"></i>
+            <span>Filters</span>
+            <span id="activeFiltersCount" class="text-xs text-gray-500"></span>
+            <i id="filterArrow" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+          </button>
+          <div id="filtersContent" class="absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 origin-top-left scale-95 opacity-0 -translate-y-3 transition-all duration-300 ease-out pointer-events-none z-10">
+            <form method="GET" class="p-6 space-y-1">
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Filter Jobs</h3>
+              <div>
+                <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input type="text" name="location" id="location" value="{{ request.GET.location }}" 
+                       placeholder="City or remote" 
+                       class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+              </div>
+              <div>
+                <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                <input type="text" name="company" id="company" value="{{ request.GET.company }}" 
+                       placeholder="Company name" 
+                       class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+              </div>
+              <div>
+                <label for="employment_type" class="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
+                <select name="employment_type" id="employment_type" class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                  <option value="">All Types</option>
+                  <option value="Full Time" {% if request.GET.employment_type == 'Full Time' %}selected{% endif %}>Full Time</option>
+                  <option value="Part Time" {% if request.GET.employment_type == 'Part Time' %}selected{% endif %}>Part Time</option>
+                  <option value="Contract" {% if request.GET.employment_type == 'Contract' %}selected{% endif %}>Contract</option>
+                  <option value="Internship" {% if request.GET.employment_type == 'Internship' %}selected{% endif %}>Internship</option>
+                </select>
+              </div>
+              <div>
+                <label for="work_mode" class="block text-sm font-medium text-gray-700 mb-1">Work Mode</label>
+                <select name="work_mode" id="work_mode"
+                        class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                  <option value="">All Modes</option>
+                  <option value="On-site" {% if request.GET.work_mode == 'On-site' %}selected{% endif %}>On-site</option>
+                  <option value="Remote" {% if request.GET.work_mode == 'Remote' %}selected{% endif %}>Remote</option>
+                  <option value="Hybrid" {% if request.GET.work_mode == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+                </select>
+              </div>
+              <div>
+                <label for="min_experience" class="block text-sm font-medium text-gray-700 mb-1">Min Experience (Years)</label>
+                <input type="number" name="min_experience" id="min_experience" value="{{ request.GET.min_experience }}" 
+                       placeholder="0" min="0"
+                       class="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+              </div>
+              {% include 'components/salary_range_slider.html' with inline=false min_id='filter_min_salary' max_id='filter_max_salary' min_value=request.GET.min_salary|default:'0' max_value=request.GET.max_salary|default:'50000' include_inputs=True %}
+
+              <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+              <div class="flex items-center gap-2 pt-2 border-t">
+                <button type="submit" class="flex-1 px-4 py-1 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition duration-300">
+                  <i class="fas fa-check mr-2"></i>Apply
+                </button>
+                <a href="{% url 'jobs' %}" class="px-4 py-1 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition duration-300">
+                  <i class="fas fa-redo"></i>
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="relative" id="sortDropdown">
+          <button type="button" onclick="toggleSortDropdown()" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+            <i class="fas fa-sort text-cyan-600"></i>
+            <span>Sort</span>
+            <i id="sortArrow" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+          </button>
+          
+          <div id="sortContent" class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 origin-top-left scale-95 opacity-0 -translate-y-3 transition-all duration-300 ease-out pointer-events-none z-10">
+            <div class="py-2">
+              <a href="?sort=newest{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.employment_type %}&employment_type={{ request.GET.employment_type }}{% endif %}{% if request.GET.work_mode %}&work_mode={{ request.GET.work_mode }}{% endif %}{% if request.GET.min_experience %}&min_experience={{ request.GET.min_experience }}{% endif %}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if request.GET.max_salary %}&max_salary={{ request.GET.max_salary }}{% endif %}" 
+                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition duration-200 {% if request.GET.sort == 'newest' or not request.GET.sort %}bg-cyan-50 text-cyan-600 font-medium{% endif %}">
+                <i class="fas fa-clock mr-3 w-4"></i>
+                <span>Newest First</span>
+              </a>
+              <a href="?sort=oldest{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.employment_type %}&employment_type={{ request.GET.employment_type }}{% endif %}{% if request.GET.work_mode %}&work_mode={{ request.GET.work_mode }}{% endif %}{% if request.GET.min_experience %}&min_experience={{ request.GET.min_experience }}{% endif %}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if request.GET.max_salary %}&max_salary={{ request.GET.max_salary }}{% endif %}" 
+                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition duration-200 {% if request.GET.sort == 'oldest' %}bg-cyan-50 text-cyan-600 font-medium{% endif %}">
+                <i class="fas fa-history mr-3 w-4"></i>
+                <span>Oldest First</span>
+              </a>
+              <a href="?sort=salary_high{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.employment_type %}&employment_type={{ request.GET.employment_type }}{% endif %}{% if request.GET.work_mode %}&work_mode={{ request.GET.work_mode }}{% endif %}{% if request.GET.min_experience %}&min_experience={{ request.GET.min_experience }}{% endif %}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if request.GET.max_salary %}&max_salary={{ request.GET.max_salary }}{% endif %}" 
+                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition duration-200 {% if request.GET.sort == 'salary_high' %}bg-cyan-50 text-cyan-600 font-medium{% endif %}">
+                <i class="fas fa-arrow-up mr-3 w-4"></i>
+                <span>Salary: High to Low</span>
+              </a>
+              <a href="?sort=salary_low{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{% if request.GET.employment_type %}&employment_type={{ request.GET.employment_type }}{% endif %}{% if request.GET.work_mode %}&work_mode={{ request.GET.work_mode }}{% endif %}{% if request.GET.min_experience %}&min_experience={{ request.GET.min_experience }}{% endif %}{% if request.GET.min_salary %}&min_salary={{ request.GET.min_salary }}{% endif %}{% if request.GET.max_salary %}&max_salary={{ request.GET.max_salary }}{% endif %}" 
+                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 transition duration-200 {% if request.GET.sort == 'salary_low' %}bg-cyan-50 text-cyan-600 font-medium{% endif %}">
+                <i class="fas fa-arrow-down mr-3 w-4"></i>
+                <span>Salary: Low to High</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {% if user.profile.role == 'Recruiter' and user.companies_created.exists %}
+          <a href="{% url 'job_create' %}" class="inline-flex items-center justify-center px-4 py-1 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition duration-300">
+            <i class="fas fa-plus mr-2"></i>
+            Post Job
+          </a>
+        {% endif %}
+
+        {% if user.profile.role == 'Recruiter' and not user.companies_created.exists %}
+          <a href="{% url 'create_company' %}" class="inline-flex items-center justify-center px-2 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-cyan-600 hover:bg-cyan-700 transition duration-300">
+            <i class="fas fa-plus mr-2"></i> <span class="text-xs"> create company </span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% if jobs %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% for job in jobs %}
+        {% include 'components/job_card.html' with job=job hide_matching_score=True show_recruiter_actions=True %}
+      {% endfor %}
+    </div>
+    {% if is_paginated %}
+    <div class="mt-8 flex items-center justify-center">
+      <nav class="flex items-center gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="px-3 py-2 border border-cyan-800 bg-cyan-600 rounded-xl text-sm text-white hover:bg-cyan-700 transition duration-300">
+          <i class="fas fa-angle-double-left"></i>
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 border border-cyan-800 bg-cyan-600 rounded-xl text-sm text-white hover:bg-cyan-700 transition duration-300">
+          <i class="fas fa-angle-left"></i>
+        </a>
+        {% endif %}
+        <span class="px-4 py-2 text-sm font-semibold text-gray-700">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 border border-cyan-800 bg-cyan-600 rounded-xl text-sm text-white hover:bg-cyan-700 transition duration-300">
+          <i class="fas fa-angle-right"></i>
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 border border-cyan-800 bg-cyan-600 rounded-xl text-sm text-white hover:bg-cyan-700 transition duration-300">
+          <i class="fas fa-angle-double-right"></i>
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+      <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-briefcase text-4xl text-gray-400"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">No Jobs Found</h3>
+      <p class="text-gray-600 mb-6">Try adjusting your filters or check back later for new opportunities.</p>
+      <a href="{% url 'jobs' %}" class="inline-flex items-center px-6 py-3 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition duration-300">
+        <i class="fas fa-redo mr-2"></i>
+        Clear Filters
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<style>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
+<script>
+function toggleFiltersDropdown() {
+  const dropdown = document.getElementById('filtersContent');
+  const arrow = document.getElementById('filterArrow');
+  const isOpen = dropdown.classList.contains('scale-100');
+  const sortDropdown = document.getElementById('sortContent');
+  const sortArrow = document.getElementById('sortArrow');
+  sortDropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+  sortDropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+  sortArrow.classList.remove('rotate-180');
+  if (isOpen) {
+    dropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    dropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    arrow.classList.remove('rotate-180');
+  } else {
+    dropdown.classList.remove('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    dropdown.classList.add('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    arrow.classList.add('rotate-180');
+  }
+}
+
+function toggleSortDropdown() {
+  const dropdown = document.getElementById('sortContent');
+  const arrow = document.getElementById('sortArrow');
+  const isOpen = dropdown.classList.contains('scale-100');
+  const filtersDropdown = document.getElementById('filtersContent');
+  const filtersArrow = document.getElementById('filterArrow');
+  filtersDropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+  filtersDropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+  filtersArrow.classList.remove('rotate-180');
+  if (isOpen) {
+    dropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    dropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    arrow.classList.remove('rotate-180');
+  } else {
+    dropdown.classList.remove('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    dropdown.classList.add('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    arrow.classList.add('rotate-180');
+  }
+}
+document.addEventListener('click', function(event) {
+  const filtersWrapper = document.getElementById('filtersDropdown');
+  const filtersDropdown = document.getElementById('filtersContent');
+  const filtersArrow = document.getElementById('filterArrow');
+  const sortWrapper = document.getElementById('sortDropdown');
+  const sortDropdown = document.getElementById('sortContent');
+  const sortArrow = document.getElementById('sortArrow');
+  
+  if (filtersWrapper && !filtersWrapper.contains(event.target)) {
+    filtersDropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    filtersDropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    filtersArrow.classList.remove('rotate-180');
+  }
+  
+  if (sortWrapper && !sortWrapper.contains(event.target)) {
+    sortDropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    sortDropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    sortArrow.classList.remove('rotate-180');
+  }
+});
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const filtersDropdown = document.getElementById('filtersContent');
+    const filtersArrow = document.getElementById('filterArrow');
+    const sortDropdown = document.getElementById('sortContent');
+    const sortArrow = document.getElementById('sortArrow');
+    
+    filtersDropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    filtersDropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    filtersArrow.classList.remove('rotate-180');
+    
+    sortDropdown.classList.remove('scale-100', 'opacity-100', 'translate-y-0', 'pointer-events-auto');
+    sortDropdown.classList.add('scale-95', 'opacity-0', '-translate-y-3', 'pointer-events-none');
+    sortArrow.classList.remove('rotate-180');
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const filterParams = ['location', 'employment_type', 'work_mode', 'min_experience', 'min_salary', 'max_salary'];
+  let activeCount = 0;
+  
+  filterParams.forEach(param => {
+    if (urlParams.get(param)) {
+      activeCount++;
+    }
+  });
+  
+  if (activeCount > 0) {
+    document.getElementById('activeFiltersCount').textContent = `(${activeCount})`;
+  }
+});
+
+function openDeleteModal(jobId) {
+    document.getElementById('deleteModal-' + jobId).classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; 
+}
+
+function closeDeleteModal(jobId) {
+    document.getElementById('deleteModal-' + jobId).classList.add('hidden');
+    document.body.style.overflow = 'auto'; 
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modals = document.querySelectorAll('[id^="deleteModal-"]');
+        modals.forEach(modal => {
+            if (!modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+});
+
+document.addEventListener('click', function(event) {
+    const modals = document.querySelectorAll('[id^="deleteModal-"]');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'layouts/main.html' %}
+{% load socialaccount %}
+
+{% block content %}
+  {% with input_classes='w-full px-3 py-2 border-2 border-cyan-300 rounded-lg focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all outline-none' error_classes='text-sm text-red-500' %}
+    <div class="min-h-[80vh] flex justify-center p-6 my-6">
+      <div class="bg-white/80 backdrop-blur-md border-2 border-cyan-200 rounded-2xl w-full max-w-xl px-10 py-8 shadow-xl">
+        <div class="text-center mb-4">
+          <div class="w-24 h-24 mx-auto mb-4 p-2 rounded-full border-2 border-cyan-600 flex items-center justify-center shadow-lg">
+            <img src="/media/system_image/logo1.png" alt="Logo" />
+          </div>
+          <h1 class="text-2xl font-bold text-cyan-800 mb-2 normal-case">Register user</h1>
+          <p class="text-gray-600 normal-case">Access your account and manage your profile!</p>
+        </div>
+        <form class="space-y-2" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="grid grid-cols-1 gap-2">
+            <div class="space-y-2">
+              <label for="first_name" class="block text-sm font-semibold text-gray-700 normal-case">First Name</label>
+              <input class="{{ input_classes }}" type="text" id="first_name" name="first_name" value="{{ request.POST.first_name }}" />
+              {% if user_form.errors.first_name %}
+                <span class="{{ error_classes }}">{{ user_form.errors.first_name }}</span>
+              {% endif %}
+            </div>
+            <div class="space-y-2">
+              <label for="last_name" class="block text-sm font-semibold text-gray-700 normal-case">Last Name</label>
+              <input class="{{ input_classes }}" type="text" id="last_name" name="last_name" value="{{ request.POST.last_name }}" />
+              {% if user_form.errors.last_name %}
+                <span class="{{ error_classes }}">{{ user_form.errors.last_name }}</span>
+              {% endif %}
+            </div>
+
+            <div class="space-y-2">
+              <label for="username" class="block text-sm font-semibold text-gray-700 normal-case">Username</label>
+              <input class="{{ input_classes }}" type="text" id="username" name="username" value="{{ request.POST.username }}" />
+              {% if user_form.errors.username %}
+                <span class="{{ error_classes }}">{{ user_form.errors.username }}</span>
+              {% endif %}
+            </div>
+            <div class="space-y-2">
+              <label for="email" class="block text-sm font-semibold text-gray-700 normal-case">Email</label>
+              <input class="{{ input_classes }}" type="email" id="email" name="email" value="{{ request.POST.email }}" />
+              {% if user_form.errors.email %}{% for error in user_form.errors.email %}
+                <div class="{{ error_classes }}">{{ error }}</div>
+              {% endfor %}{% endif %}
+            </div>
+
+            <div class="space-y-2">
+              <label for="password1" class="block text-sm font-semibold text-gray-700 normal-case">Password</label>
+              <div class="relative">
+                <input class="{{ input_classes }} pr-10" type="password" id="password1" name="password1" />
+                <button type="button" onclick="togglePassword('password1', 'password1Icon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                  <i id="password1Icon" class="fas fa-eye text-sm text-cyan-600"></i>
+                </button>
+              </div>
+              {% if user_form.errors.password1 %}{% for error in user_form.errors.password1 %}
+                <div class="{{ error_classes }}">{{ error }}</div>
+              {% endfor %}{% endif %}
+            </div>
+            <div class="space-y-2">
+              <label for="password2" class="block text-sm font-semibold text-gray-700 normal-case">Confirm Password</label>
+              <div class="relative">
+                <input class="{{ input_classes }} pr-10" type="password" id="password2" name="password2" />
+                <button type="button" onclick="togglePassword('password2', 'password2Icon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                  <i id="password2Icon" class="fas fa-eye text-sm text-cyan-600"></i>
+                </button>
+              </div>
+              {% if user_form.errors.password2 %}
+                <span class="{{ error_classes }}">{{ user_form.errors.password2 }}</span>
+              {% endif %}
+            </div>
+
+            <div class="flex items-center space-x-2 py-2">
+              <input type="checkbox" name="agree_terms" id="agree_terms" class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500" required>
+              <label for="agree_terms" class="text-sm text-gray-600 normal-case">
+                I agree to the <a href="{% url 'terms' %}" target="_blank" class="text-cyan-600 hover:underline">Terms and Conditions</a>
+              </label>
+              {% if user_form.errors.agree_terms %}
+                <span class="{{ error_classes }} block">{{ user_form.errors.agree_terms }}</span>
+              {% endif %}
+            </div>
+          <div class="w-full flex mt-2">
+            <button type="submit" class="w-full mx-auto bg-gradient-to-br from-cyan-500 via-cyan-600 to-cyan-700 hover:from-cyan-600 hover:via-cyan-700 hover:to-cyan-800 text-white font-semibold py-2 px-6 rounded-lg transition-colors shadow-lg hover:shadow-xl transition-all duration-300">Sign Up</button>
+          </div>
+        </form>
+
+        <div class="mt-4 flex items-center justify-between">
+          <span class="border-b w-2/5 lg:w-2/4"></span>
+          <a href="#" class="text-xs text-center text-gray-500 uppercase mx-2">or</a>
+          <span class="border-b w-2/5 lg:w-2/4"></span>
+        </div>
+
+        <div class="mt-4">
+          <a href="{% provider_login_url 'google' %}" class="flex items-center justify-center gap-3 w-full bg-white border border-gray-300 hover:bg-gray-50 transition-all duration-300 text-gray-700 font-semibold py-3 rounded-lg shadow-sm hover:shadow-md">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
+            Continue with Google
+          </a>
+        </div>
+      </div>
+    </div>
+  {% endwith %}
+{% endblock %}

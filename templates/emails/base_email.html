@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification - Workhub</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+    <style>
+      /* ── Reset ── */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        background-color: #e0f7fa;
+        font-family: 'DM Sans', Arial, sans-serif;
+        color: #1a1a1a;
+        -webkit-font-smoothing: antialiased;
+      }
+      
+      /* ── Outer wrapper ── */
+      .email-wrapper {
+        width: 100%;
+        padding: 48px 16px 64px;
+        background-color: #e0f7fa;
+      }
+      
+      /* ── Card ── */
+      .card {
+        max-width: 580px;
+        margin: 0 auto;
+        background: #fdfcfa;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 32px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(0, 0, 0, 0.04);
+      }
+      
+      /* ── Header strip ── */
+      .header {
+        background: #0891b2;
+        padding: 24px 40px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 3px solid #06b6d4;
+      }
+      
+      .logo-mark {
+        width: 36px;
+        height: 36px;
+        background: #ffffff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 4px;
+      }
+      
+      .logo-mark svg {
+        width: 20px;
+        height: 20px;
+      }
+      
+      .logo-text {
+        font-family: 'DM Serif Display', Georgia, serif;
+        font-size: 22px;
+        color: #ffffff;
+        letter-spacing: -0.3px;
+      }
+      
+      .logo-text span {
+        color: #a5f3fc;
+      }
+      
+      /* ── Body ── */
+      .body {
+        padding: 44px 40px 36px;
+      }
+      
+      .eyebrow {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #0891b2;
+        margin-bottom: 10px;
+      }
+      
+      .headline {
+        font-family: 'DM Serif Display', Georgia, serif;
+        font-size: 30px;
+        line-height: 1.2;
+        color: #0d0d0d;
+        margin-bottom: 12px;
+      }
+      
+      .greeting {
+        font-size: 15px;
+        color: #3d3d3d;
+        line-height: 1.7;
+        margin-bottom: 8px;
+      }
+      
+      .body-text {
+        font-size: 15px;
+        color: #555;
+        line-height: 1.75;
+        margin-bottom: 26px;
+      }
+      
+      /* ── CTA button ── */
+      .cta-wrap {
+        margin-bottom: 20px;
+      }
+      
+      .cta-button {
+        display: inline-block;
+        background: #0891b2;
+        color: #ffffff !important;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        padding: 15px 36px;
+        border-radius: 8px;
+        border-bottom: 3px solid #0e7490;
+        transition: background 0.2s;
+      }
+      
+      /* ── Divider ── */
+      .divider {
+        border: none;
+        border-top: 1px solid #edeae3;
+        margin: 28px 0;
+      }
+      
+      /* ── Fallback link block ── */
+      .fallback-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #0891b2;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      
+      .fallback-url {
+        font-size: 12px;
+        color: #777;
+        word-break: break-all;
+        line-height: 1.6;
+        background: #f0f9ff;
+        border-radius: 6px;
+        padding: 10px 14px;
+        border-left: 3px solid #0891b2;
+      }
+      
+      /* ── Expiry notice ── */
+      .notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: #ecfeff;
+        border: 1px solid #a5f3fc;
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-top: 28px;
+      }
+      
+      .notice-icon {
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      
+      .notice-text {
+        font-size: 13px;
+        color: #0e7490;
+        line-height: 1.6;
+      }
+      
+      .notice-text strong {
+        font-weight: 600;
+      }
+      
+      /* ── Ignore notice ── */
+      .ignore-note {
+        font-size: 13px;
+        color: #999;
+        line-height: 1.6;
+        margin-top: 20px;
+      }
+      
+      /* ── Footer ── */
+      .footer {
+        background: #f0f9ff;
+        border-top: 1px solid #bae6fd;
+        padding: 24px 40px;
+        text-align: center;
+      }
+      
+      .footer-brand {
+        font-family: 'DM Serif Display', Georgia, serif;
+        font-size: 14px;
+        color: #0d0d0d;
+        margin-bottom: 6px;
+      }
+      
+      .footer-tagline {
+        font-size: 12px;
+        color: #aaa;
+        line-height: 1.6;
+      }
+      
+      .footer-links {
+        margin-top: 12px;
+      }
+      
+      .footer-links a {
+        font-size: 11px;
+        color: #0891b2;
+        text-decoration: none;
+        margin: 0 8px;
+      }
+      
+      /* ── Responsive ── */
+      @media (max-width: 480px) {
+        .header,
+        .body,
+        .footer {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+      
+        .headline {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="email-wrapper">
+      <div class="card">
+        <!-- Header -->
+        <div class="header">
+          <div class="logo-mark">
+            <img 
+              src="https://raw.githubusercontent.com/Purnima-Basnet04/workhub/main/media/system_image/logo1.png" 
+              alt="Logo"
+              style="width: 32px; height: auto;"
+            />
+          </div>
+          <div class="logo-text">
+            Work<span>hub</span>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="body">
+          {% block email_content %}
+          <span class="eyebrow">{% block eyebrow %}Workhub{% endblock %}</span>
+          <h1 class="headline">{% block headline %}Welcome{% endblock %}</h1>
+
+          <p class="greeting">{% block greeting %}Hello,{% endblock %}</p>
+          <p class="body-text">{% block body_text %}{% endblock %}</p>
+
+          {% block cta_section %}
+          <div class="cta-wrap">
+            <a href="{{ cta_url }}" class="cta-button">{% block cta_button %}Click Here{% endblock %} →</a>
+          </div>
+          {% endblock %}
+
+          {% block fallback_link %}
+          {% if cta_url %}
+          <hr class="divider" />
+          <p class="fallback-label">Or copy this link into your browser</p>
+          <div class="fallback-url">{{ cta_url }}</div>
+          {% endif %}
+          {% endblock %}
+
+          {% block extra_notice %}{% endblock %}
+
+          {% block ignore_note %}{% endblock %}
+          {% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <div class="footer-brand">Workhub</div>
+          <div class="footer-tagline">
+            &copy;{% now 'Y' %}Workhub. All rights reserved.<br />
+            This is an automated message — please do not reply directly to this email.
+          </div>
+          <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Help Centre</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

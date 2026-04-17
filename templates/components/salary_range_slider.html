@@ -1,0 +1,205 @@
+<div class="salary-range-slider-container mb-4">
+    {% if include_inputs %}
+    <input type="hidden" name="min_salary" id="{{ min_id }}" value="{{ min_value|default:0 }}">
+    <input type="hidden" name="max_salary" id="{{ max_id }}" value="{{ max_value|default:50000 }}">
+    {% endif %}
+
+    <!-- Labels Above -->
+    <div class="flex justify-between items-end mb-1 px-1">
+        <div class="flex flex-col">
+            <span class="text-[10px] text-gray-400 uppercase font-semibold tracking-tight">Minimum</span>
+            <span id="{{ min_id }}-label" class="text-sm font-bold text-cyan-700">$0</span>
+        </div>
+        <div class="flex flex-col text-right">
+            <span class="text-[10px] text-gray-400 uppercase font-semibold tracking-tight">Maximum</span>
+            <span id="{{ max_id }}-label" class="text-sm font-bold text-cyan-700">$50,000</span>
+        </div>
+    </div>
+
+    <!-- Slider Track Container -->
+    <div class="relative h-1.5 bg-gray-200 rounded-full mt-2 mb-6 mx-1">
+        <!-- Colored track between thumbs -->
+        <div id="{{ min_id }}-track" class="absolute h-full bg-cyan-600 rounded-full z-10" style="left: 0%; right: 90%;"></div>
+        
+        <!-- The two sliders -->
+        <input type="range" id="{{ min_id }}-range" 
+               class="salary-slider absolute inset-x-0 -top-2 w-full h-5 appearance-none bg-transparent pointer-events-none z-20"
+               min="0" max="500000" step="1000" value="{{ min_value|default:0 }}">
+               
+        <input type="range" id="{{ max_id }}-range" 
+               class="salary-slider absolute inset-x-0 -top-2 w-full h-5 appearance-none bg-transparent pointer-events-none z-30"
+               min="0" max="500000" step="1000" value="{{ max_value|default:50000 }}">
+    </div>
+</div>
+
+<style>
+    .salary-slider::-webkit-slider-thumb {
+        pointer-events: auto;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #ffffff;
+        border: 3px solid #0891b2; /* cyan-600 */
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s ease;
+    }
+
+    .salary-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+    }
+
+    .salary-slider::-moz-range-thumb {
+        pointer-events: auto;
+        width: 16px;
+        height: 16px;
+        background: #ffffff;
+        border: 3px solid #0891b2;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .salary-slider::-webkit-slider-runnable-track {
+        appearance: none;
+        background: transparent;
+    }
+    
+    .salary-slider::-moz-range-track {
+        background: transparent;
+    }
+</style>
+
+<script>
+(function() {
+    function initSlider() {
+        const minRange = document.getElementById('{{ min_id }}-range');
+        const maxRange = document.getElementById('{{ max_id }}-range');
+        const minLabel = document.getElementById('{{ min_id }}-label');
+        const maxLabel = document.getElementById('{{ max_id }}-label');
+        const track = document.getElementById('{{ min_id }}-track');
+        
+        let minInput = document.getElementById('{{ min_id }}');
+        let maxInput = document.getElementById('{{ max_id }}');
+
+        const totalMax = 500000;
+
+        function formatCurrency(val) {
+            if (val === 0 || val === '0') return '$0';
+            return '$' + parseInt(val).toLocaleString();
+        }
+
+        function updateUI(syncToInput = true) {
+            if (!minRange || !maxRange) return;
+
+            const minVal = parseInt(minRange.value) || 0;
+            const maxVal = parseInt(maxRange.value) || 0;
+            
+            // Update labels
+            if (minLabel) minLabel.textContent = formatCurrency(minVal);
+            if (maxLabel) maxLabel.textContent = formatCurrency(maxVal);
+
+            // Update track
+            if (track) {
+                const leftPercent = (minVal / totalMax) * 100;
+                const rightPercent = 100 - (maxVal / totalMax) * 100;
+                track.style.left = leftPercent + '%';
+                track.style.right = rightPercent + '%';
+            }
+
+            // Sync
+            if (syncToInput) {
+                if (!minInput) minInput = document.getElementById('{{ min_id }}');
+                if (!maxInput) maxInput = document.getElementById('{{ max_id }}');
+                
+                if (minInput && minInput.value != minVal) {
+                    minInput.value = minVal;
+                    minInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                if (maxInput && maxInput.value != maxVal) {
+                    maxInput.value = maxVal;
+                    maxInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        }
+
+        minRange.addEventListener('input', () => {
+            let val = parseInt(minRange.value) || 0;
+            let maxVal = parseInt(maxRange.value) || 0;
+            if (val > maxVal) {
+                minRange.value = maxVal;
+            }
+            updateUI(true);
+        });
+
+        maxRange.addEventListener('input', () => {
+            let val = parseInt(maxRange.value) || 0;
+            let minVal = parseInt(minRange.value) || 0;
+            if (val < minVal) {
+                maxRange.value = minVal;
+            }
+            updateUI(true);
+        });
+
+        const handleInputChange = (e) => {
+            let val = parseInt(e.target.value) || 0;
+            if (val < 0) val = 0;
+            if (val > totalMax) val = totalMax;
+            
+            if (e.target === minInput) {
+                let currentMax = parseInt(maxRange.value) || 0;
+                if (val > currentMax) val = currentMax;
+                minRange.value = val;
+            } else if (e.target === maxInput) {
+                let currentMin = parseInt(minRange.value) || 0;
+                if (val < currentMin) val = currentMin;
+                maxRange.value = val;
+            }
+            updateUI(false);
+        };
+
+        const attachInputListeners = () => {
+            if (!minInput) minInput = document.getElementById('{{ min_id }}');
+            if (!maxInput) maxInput = document.getElementById('{{ max_id }}');
+            if (minInput) {
+                minInput.addEventListener('input', handleInputChange);
+                minInput.addEventListener('change', handleInputChange);
+            }
+            if (maxInput) {
+                maxInput.addEventListener('input', handleInputChange);
+                maxInput.addEventListener('change', handleInputChange);
+            }
+        };
+
+        // Handle z-indexing on overlap
+        minRange.addEventListener('mousedown', () => minRange.style.zIndex = '40');
+        maxRange.addEventListener('mousedown', () => maxRange.style.zIndex = '40');
+        minRange.addEventListener('mouseup', () => minRange.style.zIndex = '20');
+        maxRange.addEventListener('mouseup', () => maxRange.style.zIndex = '30');
+
+        attachInputListeners();
+        
+        if (minInput && (minInput.value !== "")) minRange.value = minInput.value;
+        if (maxInput && (maxInput.value !== "")) maxRange.value = maxInput.value;
+        
+        updateUI(false);
+
+        if (!minInput || !maxInput) {
+            setTimeout(() => {
+                attachInputListeners();
+                if (minInput && minInput.value !== "") minRange.value = minInput.value;
+                if (maxInput && maxInput.value !== "") maxRange.value = maxInput.value;
+                updateUI(false);
+            }, 500);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSlider);
+    } else {
+        initSlider();
+    }
+})();
+</script>
+

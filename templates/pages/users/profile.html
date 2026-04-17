@@ -1,0 +1,376 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+{% include 'components/delete_dialog.html' %}
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+        <div class="h-28 bg-gradient-to-r from-cyan-500 to-cyan-600"></div>
+        <div class="px-6 pb-6">
+          <div class="flex flex-col sm:flex-row items-center sm:items-end -mt-24 sm:-mt-20">
+            <div class="flex flex-col">
+              <img src="{{ profile.profile_image.url }}" alt="{{ user.username }}" class="w-32 h-32 rounded-full border-4 border-white bg-gray-100 shadow-lg object-cover" />
+              <h1 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h1>
+              <p class="text-gray-600">{{ profile.position }}</p>
+            </div>
+            <div class="mt-6 sm:mt-0 sm:ml-6 text-center sm:text-left flex-1">
+              <p class="text-gray-600">@{{ user.username }}</p>
+              <div class="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">{{ profile.get_role_display }}</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">{{ profile.gender }}</span>
+              </div>
+            </div>
+            <div class="mt-4 sm:mt-0">
+              <a href="/user/profile/edit" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-edit mr-2"></i>
+                Edit Profile
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-1 space-y-2">
+          <div class="bg-white rounded-lg shadow-sm px-6 py-3">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
+            <div class="space-y-3">
+              <div class="flex items-start">
+                <i class="fas fa-envelope text-gray-400 mt-0.5 mr-3 w-5"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Email</p>
+                  <p class="text-sm font-medium text-gray-900">{{ user.email }}</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <i class="fas fa-phone text-gray-400 mt-0.5 mr-3 w-5"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Phone</p>
+                  <p class="text-sm font-medium text-gray-900">{{ profile.phone }}</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <i class="fas fa-map-marker-alt text-gray-400 mt-0.5 mr-3 w-5"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Address</p>
+                  <p class="text-sm font-medium text-gray-900">{{ profile.address }}</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <i class="fas fa-flag text-gray-400 mt-0.5 mr-3 w-5"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Nationality</p>
+                  <p class="text-sm font-medium text-gray-900">{{ profile.nationality }}</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <i class="fas fa-calendar text-gray-400 mt-0.5 mr-3 w-5"></i>
+                <div>
+                  <p class="text-sm text-gray-500">Date of Birth</p>
+                  <p class="text-sm font-medium text-gray-900">
+                    {% if profile.dob %}
+                      {{ profile.dob|date:'F d, Y' }}
+                    {% else %}
+                      <span class="text-gray-400 italic">Not added</span>
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm px-6 py-3">
+            <h2 class="text-lg font-semibold text-gray-900 mb-2"><i class="fas fa-map-marker-alt mr-2 text-gray-600"></i>Job Preferences</h2>
+            <div class="grid grid-cols-1 gap-2">
+              <div>
+                <p class="text-sm text-gray-500">Preferred Location</p>
+                <p class="text-sm font-medium text-gray-900">
+                  {% if profile.preferred_location %}
+                    {{ profile.preferred_location }}
+                  {% else %}
+                    <span class="text-gray-400 italic">Not added</span>
+                  {% endif %}
+                </p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Preferred Job Type</p>
+                <p class="text-sm font-medium text-gray-900">
+                  {% if profile.preferred_job_type %}
+                    {{ profile.preferred_job_type }}
+                  {% else %}
+                    <span class="text-gray-400 italic">Not added</span>
+                  {% endif %}
+                </p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Preferred Work Mode</p>
+                <p class="text-sm font-medium text-gray-900">
+                  {% if profile.preferred_work_mode %}
+                    {{ profile.preferred_work_mode }}
+                  {% else %}
+                    <span class="text-gray-400 italic">Not added</span>
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm px-6 py-3">
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">Login Details</h2>
+            <div>
+              <p class="text-sm text-gray-500">Member Since</p>
+              <p class="text-sm font-medium text-gray-900">{{ profile.created_at|date:'F d, Y' }}</p>
+            </div>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">Last Login</p>
+              <p class="text-sm font-medium text-gray-900">{{ user.last_login|date:'F d, Y H:i' }}</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-file-pdf mr-2 text-gray-600"></i> Resume</h2>
+            <a href="/user/resume/{{ profile.id }}" class="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <i class="fas fa-download mr-2"></i>
+              View Resume
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-2 lg:max-h-[117vh] lg:overflow-y-auto scroll">
+          <div class="bg-white rounded-lg shadow-sm px-6 py-3">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center"><i class="fa fa-list-alt mr-2 text-gray-600"></i>Professional Summary</h2>
+              <a href="/user/profile/edit" class="text-gray-500 hover:text-gray-800"><button class="text-sm border border-cyan-500 text-cyan-600 px-3 py-1 rounded-md hover:bg-cyan-50 transition">Edit</button></a>
+            </div>
+            <div class="prose prose-sm max-w-none text-gray-700 text-justify mx-2">
+              {% if profile.summary %}
+                {{ profile.summary|linebreaks }}
+              {% else %}
+                <p class="text-gray-400 italic">No Summary added</p>
+              {% endif %}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm px-6 py-3">
+            <div class="flex items-center justify-between mb-5">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center"><i class="fas fa-code mr-2 text-gray-600"></i>Skills</h2>
+              <button type="button" id="toggleSkills" class="text-sm border border-cyan-500 text-cyan-600 px-3 py-1 rounded-md hover:bg-cyan-50 transition">
+                {% if profile.skills.all %}
+                  Edit
+                {% else %}
+                  Add
+                {% endif %}
+              </button>
+            </div>
+            <div id="skillsDisplay">
+              <div class="flex flex-wrap gap-2 mb-2">
+                {% for skill in profile.skills.all %}
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">{{ skill.name }}</span>
+                {% endfor %}
+              </div>
+              {% if not profile.skills.all %}
+                <p class="text-gray-400 italic mb-2">No skills added</p>
+              {% endif %}
+            </div>
+            <form id="skillsForm" action="/user/skills/add/" method="post" class="hidden mt-4">
+              {% csrf_token %}
+              {% include 'components/skills_input.html' with container_id='skills-container' input_id='skills-input' hidden_id='skills-hidden' dropdown_id='skills-dropdown' suggestions_id='skills-suggestions' name='skills' label='' placeholder='Type to search skills' skills=skills value=skills_ids_str %}
+              <div class="flex gap-2 mt-3">
+                <button type="submit" class="border rounded-lg px-4 py-1 border-green-500 hover:bg-green-50 duration-300">Save</button>
+                <button type="button" id="cancelSkills" class="border rounded-lg px-4 py-1 border-gray-400 hover:bg-gray-50 duration-300">Cancel</button>
+              </div>
+            </form>
+          </div>
+          <script>
+            const toggleBtn = document.getElementById('toggleSkills')
+            const display = document.getElementById('skillsDisplay')
+            const form = document.getElementById('skillsForm')
+            const cancel = document.getElementById('cancelSkills')
+            toggleBtn.onclick = () => {
+              display.classList.add('hidden')
+              form.classList.remove('hidden')
+              toggleBtn.classList.add('hidden')
+            }
+            cancel.onclick = () => {
+              form.classList.add('hidden')
+              display.classList.remove('hidden')
+              toggleBtn.classList.remove('hidden')
+            }
+          </script>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 relative">
+            <div class="flex items-center justify-between mb-5">
+              <div class="flex items-center gap-3">
+                <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <i class="fas fa-briefcase text-gray-500"></i>
+                  Experience
+                </h2>
+                {% if experience_duration %}
+                  <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                    {% if experience_duration.years > 0 %}
+                      {{ experience_duration.years }} yrs
+                    {% endif %}
+                    {% if experience_duration.months > 0 %}
+                      {% if experience_duration.years > 0 %}, {% endif %}
+                      {{ experience_duration.months }} months
+                    {% endif %}
+                    {% if experience_duration.days > 0 %}
+                      {% if experience_duration.years > 0 or experience_duration.months > 0 %}, {% endif %}
+                      {{ experience_duration.days }} days
+                    {% endif %}
+                  </span>
+                {% endif %}
+              </div>
+              <a href="/user/experience/add" class="text-sm border border-cyan-500 text-cyan-600 px-3 py-1 rounded-md hover:bg-cyan-50 transition">Add</a>
+            </div>
+            {% if profile.experiences.exists %}
+              <div class="space-y-4">
+                {% for exp in profile.experiences.all %}
+                  <div class="border-l-2 border-cyan-500 pl-4 pr-6">
+                    <div class="flex items-center gap-6">
+                      <h3 class="text-sm font-semibold text-gray-900">{{ exp.job_title }}</h3>
+                      <div class="flex gap-4">
+                        <a href="/user/experience/{{ exp.id }}/edit" class="text-gray-400 hover:text-cyan-600 transition" title="Edit experience"><i class="fas fa-pen text-xs"></i></a>
+                        <button onclick="openDeleteDialog('Delete Experience', '{{ exp.job_title }}', '/user/experience/{{ exp.id }}/delete/')" class="text-gray-400 hover:text-red-600" title="Delete experience"><i class="fas fa-trash text-xs"></i></button>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-600">{{ exp.company_name }}</p>
+                    <p class="text-xs text-gray-500">{{ exp.start_date }} – {{ exp.end_date|default:'Present' }}</p>
+                    {% if exp.description %}
+                      <p class="mt-1 text-sm text-gray-700">{{ exp.description | linebreaks }}</p>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-sm text-gray-400 italic">No experience added</p>
+            {% endif %}
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 relative">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-gray-500"></i>
+                Education
+              </h2>
+              <a href="/user/education/add" class="text-sm border border-cyan-500 text-cyan-600 px-3 py-1 rounded-md hover:bg-cyan-50">Add</a>
+            </div>
+
+            {% if profile.educations.exists %}
+              <div class="space-y-4">
+                {% for edu in profile.educations.all %}
+                  <div class="border-l-2 border-cyan-500 pl-4 pr-6">
+                    <div class="flex items-center gap-4">
+                      <h3 class="text-sm font-semibold text-gray-900">{{ edu.degree }} – {{ edu.field_of_study }}</h3>
+                      <div class="flex gap-4">
+                        <a href="/user/education/{{ edu.id }}/edit" class="text-gray-400 hover:text-cyan-600"><i class="fas fa-pen text-xs"></i></a>
+                        <button onclick="openDeleteDialog('Delete Education', '{{ edu.degree }} – {{ edu.field_of_study }}', '/user/education/{{ edu.id }}/delete/')" class="text-gray-400 hover:text-red-600" title="Delete education"><i class="fas fa-trash text-xs"></i></button>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-600">{{ edu.institution_name }}</p>
+                    <p class="text-xs text-gray-500">{{ edu.start_date }} – {{ edu.end_date|default:'Present' }}</p>
+                    {% if edu.description %}
+                      <p class="mt-1 text-sm text-gray-700">{{ edu.description | linebreaks }}</p>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-sm text-gray-400 italic">No education added</p>
+            {% endif %}
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 relative">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <i class="fa fa-certificate text-gray-500"></i>
+                Certifications
+              </h2>
+              <a href="/user/certification/add" class="text-sm border border-cyan-500 text-cyan-600 px-3 py-1 rounded-md hover:bg-cyan-50">Add</a>
+            </div>
+
+            {% if profile.certifications.exists %}
+              <div class="space-y-4">
+                {% for cert in profile.certifications.all %}
+                  <div class="border-l-2 border-cyan-500 pl-4 pr-6">
+                    <div class="flex items-center gap-4">
+                      <h3 class="text-sm font-semibold text-gray-900">{{ cert.name }}</h3>
+                      <div class="flex gap-4">
+                        <a href="/user/certification/{{ cert.id }}/edit" class="text-gray-400 hover:text-cyan-600"><i class="fas fa-pen text-xs"></i></a>
+                        <button onclick="openDeleteDialog('Delete Certification', '{{ cert.name }}', '/user/certification/{{ cert.id }}/delete/')" class="text-gray-400 hover:text-red-600" title="Delete certification"><i class="fas fa-trash text-xs"></i></button>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-600">{{ cert.issuing_organization }}</p>
+                    <p class="text-xs text-gray-500">
+                      Issued: {{ cert.issue_date }}
+                      {% if cert.expiration_date %}
+                        – Expires: {{ cert.expiration_date }}
+                      {% endif %}
+                    </p>
+                    {% if cert.credential_url %}
+                      <a href="{{ cert.credential_url }}" target="_blank" class="text-sm text-blue-600 hover:underline">View Credential</a>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-sm text-gray-400 italic">No certifications added</p>
+            {% endif %}
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 relative">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <i class="fas fa-share-alt text-gray-500"></i>
+                Social Links
+              </h2>
+              <a href="/user/social-links/add" class="text-sm border border-cyan-500 text-cyan-600 px-3 py-1 rounded-md hover:bg-cyan-50">Add</a>
+            </div>
+
+            {% if profile.social_links.exists %}
+              <div class="flex flex-wrap gap-2">
+                {% for link in profile.social_links.all %}
+                  <div class="flex items-center gap-2">
+                    <a href="{{ link.url }}" target="_blank" class="px-3 py-1 rounded-full text-sm bg-green-50 text-green-700 border border-green-200">{{ link.platform }}</a>
+                    <div class="flex gap-2">
+                      <a href="/user/social-links/{{ link.id }}/edit" class="text-gray-400 hover:text-cyan-600"><i class="fas fa-pen text-xs"></i></a>
+                      <button onclick="openDeleteDialog('Delete Social Link', '{{link.platform}}', '/user/social-links/{{ link.id }}/delete/')" class="text-gray-400 hover:text-red-600" title="Delete social link"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-sm text-gray-400 italic">No social links added</p>
+            {% endif %}
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 relative">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <i class="fas fa-project-diagram text-gray-500"></i>
+                Projects
+              </h2>
+              <a href="/user/projects/add" class="text-sm border border-cyan-500 text-cyan-600 px-3 py-1 rounded-md hover:bg-cyan-50">Add</a>
+            </div>
+
+            {% if profile.projects.exists %}
+              <div class="space-y-3">
+                {% for project in profile.projects.all %}
+                  <div class="border border-gray-200 rounded-md p-4">
+                    <div class="flex items-center gap-4">
+                      <p class="font-medium text-gray-900">{{ project.title }}</p>
+                      <div class="flex gap-2">
+                        <a href="/user/projects/{{ project.id }}/edit" class="text-gray-400 hover:text-cyan-600" title="Edit project"><i class="fas fa-pen text-xs"></i></a>
+                        <button onclick="openDeleteDialog('Delete Project', '{{ project.title }}', '/user/projects/{{ project.id }}/delete/')" class="text-gray-400 hover:text-red-600" title="Delete project"><i class="fas fa-trash text-xs"></i></button>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-700 mt-1">{{ project.description | linebreaks }}</p>
+                    {% if project.project_url %}
+                      <a href="{{ project.project_url }}" target="_blank" class="text-sm text-blue-600 hover:underline mt-1 inline-block">View Project</a>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-sm text-gray-400 italic">No projects added</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
