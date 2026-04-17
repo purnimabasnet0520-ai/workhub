@@ -1,0 +1,36 @@
+# accounts/urls.py
+from django.urls import path
+from .views import *
+
+urlpatterns = [
+    path("register/", register, name="register"),
+    path("login", login_user, name="login"),
+    path("profile/", profile_view, name="profile"),
+    path("profile/edit/", profile_update, name="profile-update"),
+    path("logout", logoutUser, name="logout"),
+    path("skills/add/", add_skill, name="add-skills"),
+    path("experience/add/", add_or_edit_experience, name="add-experience"),
+    path("experience/<int:id>/edit/", add_or_edit_experience, name="edit-experience"),
+    path("education/add/", add_or_edit_education, name="add-education"),
+    path("education/<int:id>/edit/", add_or_edit_education, name="edit-education"),
+    path("certification/add/", add_or_edit_certification, name="add-certification"),
+    path("certification/<int:id>/edit/", add_or_edit_certification, name="edit-certification"),
+    path("social-links/add/", add_or_edit_social_link, name="add-social-link"),
+    path("social-links/<int:id>/edit", add_or_edit_social_link, name="edit-social-link"),
+    path("projects/add/", add_or_edit_project, name="add-project"),
+    path("projects/<int:id>/edit/", add_or_edit_project, name="edit-project"),
+    path("experience/<int:id>/delete/", delete_experience, name="delete-experience"),
+    path("education/<int:id>/delete/", delete_education, name="delete-education"),
+    path("certification/<int:id>/delete/", delete_certification, name="delete-certification"),
+    path("social-links/<int:id>/delete/", delete_social_link, name="delete-social-link"),
+    path("projects/<int:id>/delete/", delete_project, name="delete-project"),
+    path("resume/<int:profile_id>", view_resume, name="generate-resume"),
+    path("verify-email/<int:user_id>/<str:token>/", verify_email, name="verify-email"),
+    path("verify-otp/", otp_verification, name="verify-otp"),
+    path("resend-otp/", resend_otp, name="resend-otp"),
+    path("forgot-password/", forgot_password, name="forgot-password"),
+    path("password-reset-otp/", password_reset_otp, name="password-reset-otp"),
+    path("resend-password-reset-otp/", resend_password_reset_otp, name="resend-password-reset-otp"),
+    path("reset-password/", reset_password, name="reset-password"),
+    path("terms/", terms_view, name="terms"),
+]
