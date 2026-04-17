@@ -1,0 +1,91 @@
+/* Admin brand text beside sidebar logo */
+#nav-sidebar .border-b a[href="/admin/"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  text-decoration: none;
+}
+
+#nav-sidebar .border-b a[href="/admin/"]::after {
+  content: "WorkHub Admin";
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  color: var(--color-font-important-light, #0f172a);
+  white-space: nowrap;
+}
+
+/* Make the sidebar search use the full width of its container */
+#nav-sidebar .mb-2\.5.mx-3 > div,
+#nav-sidebar input[type="search"] {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Make the changelist search bar fill the available toolbar width */
+#toolbar,
+#toolbar form,
+#toolbar form > div,
+#toolbar .lg\:w-96 {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#toolbar form > div {
+  flex: 1 1 auto !important;
+}
+
+/* Make the top-right add action a proper text button */
+#header-inner a[href$="/add/"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  width: auto !important;
+  min-width: 7rem !important;
+  padding: 0 1rem !important;
+  border-radius: 0.5rem !important;
+  white-space: nowrap !important;
+  color: #fff !important;
+}
+
+#header-inner a[href$="/add/"]::after,
+#header-inner a[href$="/add/"] span,
+#header-inner a[href$="/add/"] svg {
+  color: #fff !important;
+  flex-shrink: 0;
+}
+
+/* Page-specific labels for add buttons */
+.model-user #header-inner a[href$="/add/"]::after {
+  content: " Add User";
+}
+
+.model-profile #header-inner a[href$="/add/"]::after {
+  content: " Add Profile";
+}
+
+.model-job #header-inner a[href$="/add/"]::after {
+  content: " Add Job";
+}
+
+.model-company #header-inner a[href$="/add/"]::after {
+  content: " Add Company";
+}
+
+.model-application #header-inner a[href$="/add/"]::after {
+  content: " Add Application";
+}
+
+.model-usernotification #header-inner a[href$="/add/"]::after {
+  content: " Add Notification";
+}
+
+.model-verificationcode #header-inner a[href$="/add/"]::after {
+  content: " Add Code";
+}
+
+.model-skill #header-inner a[href$="/add/"]::after {
+  content: " Add Skill";
+}
