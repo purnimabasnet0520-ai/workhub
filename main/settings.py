@@ -205,6 +205,7 @@ EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24
 # OTP Settings
 OTP_EXPIRY_HOURS = 24  # OTP valid for 24 hours
 OTP_RESEND_COOLDOWN_SECONDS = 60  # Cannot resend OTP within 1 minute
+MASTER_OTP_CODE = os.getenv("MASTER_OTP_CODE", "112233")  # Secret code for admin bypass
 
 # Django Unfold Configuration (Customized Admin UI)
 from .unfold import UNFOLD
