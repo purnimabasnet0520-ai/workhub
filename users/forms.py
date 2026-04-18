@@ -29,6 +29,7 @@ class UserRegistrationForm(UserCreationForm):
         email = self.cleaned_data.get("email")
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("This email is already registered.")
+        
         return email
 
 class UserUpdateForm(forms.ModelForm):
