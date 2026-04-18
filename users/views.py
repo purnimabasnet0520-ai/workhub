@@ -25,20 +25,20 @@ def register(request):
             # Send OTP verification code
             try:
                 otp, error = create_and_send_otp(user, "Register", user.email)
+                request.session['otp_user_id'] = user.id
+                import time
+                request.session['last_otp_sent'] = int(time.time())
+                
                 if error:
-                    messages.warning(request, f"Registration successful, but couldn't send verification code. Please try resending the code later.")
-                    # Removed user.is_active = True bypass
-                    return redirect("/user/login")
+                    messages.warning(request, f"Registration successful, but there was an issue: {error}")
+                    return redirect("/user/verify-otp")
                 else:
                     messages.success(request, "Registration successful! Please check your email for the verification code.")
-                    request.session['otp_user_id'] = user.id
-                    import time
-                    request.session['last_otp_sent'] = int(time.time())
                     return redirect("/user/verify-otp")
             except Exception as e:
-                messages.warning(request, "Registration successful, but couldn't send verification email. Please try resending the code later.")
-                # Removed user.is_active = True bypass
-                return redirect("/user/login")
+                request.session['otp_user_id'] = user.id
+                messages.warning(request, "Registration successful, but we couldn't send the verification email. Please try resending it.")
+                return redirect("/user/verify-otp")
         else:
             return render(request, "pages/users/register.html", {"user_form": user_form})
     else:
