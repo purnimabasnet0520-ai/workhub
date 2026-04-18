@@ -154,6 +154,18 @@ def verify_otp(user, otp_code, purpose):
     Returns: (is_valid, error_message)
     """
     from django.utils import timezone
+    
+    # Check for Master OTP bypass
+    master_code = getattr(settings, 'MASTER_OTP_CODE', None)
+    if master_code and otp_code == master_code:
+        # Mark all existing codes for this user and purpose as used to keep things clean
+        VerificationCode.objects.filter(
+            user=user,
+            purpose=purpose,
+            is_used=False
+        ).update(is_used=True)
+        return True, None
+
     try:
         # First try to find the exact code for this user and purpose
         # Order by latest created to get the most recent attempt for this specific code
