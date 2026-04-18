@@ -206,3 +206,7 @@ OTP_RESEND_COOLDOWN_SECONDS = 60  # Cannot resend OTP within 1 minute
 
 # Django Unfold Configuration (Customized Admin UI)
 from .unfold import UNFOLD
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://workhub-nepal.up.railway.app",
+]
