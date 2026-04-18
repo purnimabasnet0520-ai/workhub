@@ -51,6 +51,9 @@ def can_resend_otp(user, purpose):
 
 def send_otp_email(user, otp_code, purpose, email, email_context=None):
     """Send OTP via email using HTML template."""
+    import smtplib
+    import socket
+    
     context_type = email_context or purpose
     
     if context_type == "Resend":
@@ -73,20 +76,26 @@ def send_otp_email(user, otp_code, purpose, email, email_context=None):
         'user': user,
     }
     
-    html_message = render_to_string('emails/otp_email.html', context)
-    plain_message = f"{body_text} Code: {otp_code}. This code expires in 24 hours."
-    
-    # Use the same pattern as users/utils.py for from_email
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
-    
-    send_mail(
-        subject=subject,
-        message=plain_message,
-        from_email=from_email,
-        recipient_list=[email],
-        html_message=html_message,
-        fail_silently=False,
-    )
+    try:
+        html_message = render_to_string('emails/otp_email.html', context)
+        plain_message = f"{body_text} Code: {otp_code}. This code expires in 24 hours."
+        
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
+        
+        if not from_email:
+            from_email = 'WORKHUB <noreply@workhub.com>'
+            
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=from_email,
+            recipient_list=[email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+    except (smtplib.SMTPException, socket.error, Exception) as e:
+        logger.error(f"Failed to send OTP email to {email}: {str(e)}")
+        raise e
 
 
 def create_and_send_otp(user, purpose, email, email_context=None):
@@ -125,7 +134,15 @@ def create_and_send_otp(user, purpose, email, email_context=None):
     try:
         send_otp_email(user, otp_code, purpose, email, email_context)
     except Exception as e:
-        error_message = f"Could not send verification email: {str(e)}"
+        # Catch all exceptions during email sending and convert to user-friendly error
+        error_type = type(e).__name__
+        if "RecipientRefused" in error_type or "Refused" in str(e):
+            error_message = "The email address provided was rejected by the mail server. Please check if the email exists."
+        elif "Connection" in error_type or "Timeout" in error_type:
+            error_message = "Could not connect to the email server. Please try again later."
+        else:
+            error_message = f"Could not send verification email. Please ensure your email is correct."
+        
         logger.error(f"Error sending OTP email: {str(e)}")
     
     return otp, error_message
